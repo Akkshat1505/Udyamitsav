@@ -1784,3 +1784,7 @@ section,
   display: flex;
   align-items: center;
 }
+
+.hidden-events{
+  display: none;
+}

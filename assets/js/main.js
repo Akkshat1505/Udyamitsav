@@ -180,3 +180,8 @@
 })();
 
 
+let eveButt = document.getElementById('nav-link');
+eveButt.addEventListener('click', function() {
+  let targetDiv = document.querySelector('#day-1');
+  targetDiv.classList.remove('.hidden-events');
+});
