@@ -19,7 +19,7 @@
             align-items: center;
             height: 100vh;
         }
-
+    
         /* Form Container */
         .purchase-form {
             width: 360px;
@@ -28,7 +28,7 @@
             border-radius: 10px;
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
         }
-
+    
         /* Form Heading */
         .purchase-form h2 {
             font-size: 1.5em;
@@ -37,7 +37,7 @@
             text-align: center;
             font-weight: 600;
         }
-
+    
         /* Labels and Input Fields */
         .purchase-form label {
             font-size: 0.9em;
@@ -66,7 +66,21 @@
             border-color: #007bff;
             outline: none;
         }
-
+    
+        /* QR Code Styling */
+        .qr-code-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .qr-code-container img {
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+        }
+    
         /* Total Amount */
         .total-amount {
             margin: 15px 0;
@@ -78,7 +92,7 @@
             font-size: 1.1em;
             color: #007bff;
         }
-
+    
         /* Submit Button */
         .purchase-form input[type="submit"] {
             width: 100%;
@@ -98,74 +112,74 @@
     </style>
 </head>
 <body>
+    <div class="purchase-form">
+        <h2 id="Access">Purchase Standard Access</h2>
+        <form id="purchaseForm">
+            <label for="username">Name</label>
+            <input type="text" id="username" name="username" placeholder="Enter your name" required>
+    
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+    
+            <div class="qr-code-container">
+                <img src="qr.png" alt="QR Code for Payment">
+            </div>
+            
+            <label for="transaction-id">Transaction Id</label>
+            <input type="text" id="transaction-id" name="transaction-id" class="transaction-id" placeholder="Enter your Transaction Id" required>
+    
+            <div class="total-amount">
+                Total Payable: $<span id="totalAmount">0.00</span>
+            </div>
+    
+            <input type="submit" value="Proceed to Payment">
+        </form>
+    </div>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.0/package/dist/xlsx.full.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const type = urlParams.get('type');  // Get type from URL
+            if (type) {
+                assign(type);  // Update the page based on type
+            }
+        });
 
-<div class="purchase-form">
-    <h2 id="Access">Purchase Premium Access</h2>
-    <form id="purchaseForm">
-        <label for="username">Name</label>
-        <input type="text" id="username" name="username" placeholder="Enter your name" required>
-
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required>
-
-        <label for="phone">Phone Number</label>
-        <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
-
-        <label for="upi-id">UPI ID</label>
-        <input type="text" id="upi-id" name="upi-id" class="upi-id" placeholder="Enter your UPI ID" required>
-
-        <div class="total-amount">
-            Total Payable: $<span id="totalAmount">0.00</span>
-        </div>
-
-        <input type="submit" value="Proceed to Payment">
-    </form>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const type = urlParams.get('type');  // Get type from URL
-        if (type) {
-            assign(type);  // Update the page based on type
+        function assign(id) {
+            const totalAmountElem = document.getElementById('totalAmount');
+            const accessElem = document.getElementById('Access');
+            
+            if (id === "standard-buy") {
+                totalAmountElem.innerHTML = '150';
+                accessElem.innerHTML = "Purchase Standard Access";
+            } else if (id === "premium-buy") {
+                totalAmountElem.innerHTML = '250';
+                accessElem.innerHTML = "Purchase Premium Access";
+            } else if (id === "pro-buy") {
+                totalAmountElem.innerHTML = '350';
+                accessElem.innerHTML = "Purchase Pro Access";
+            }
         }
-    });
 
-    function assign(id) {
-        const totalAmountElem = document.getElementById('totalAmount');
-        const accessElem = document.getElementById('Access');
-        
-        if (id === "standard-buy") {
-            totalAmountElem.innerHTML = '150';
-            accessElem.innerHTML = "Purchase Standard Access";
-        } else if (id === "premium-buy") {
-            totalAmountElem.innerHTML = '250';
-            accessElem.innerHTML = "Purchase Premium Access";
-        } else if (id === "pro-buy") {
-            totalAmountElem.innerHTML = '350';
-            accessElem.innerHTML = "Purchase Pro Access";
-        }
-    }
+        document.getElementById('purchaseForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-    const form = document.getElementById('purchaseForm');
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
+            const formData = new FormData(this);
+            formData.append("totalAmount", document.getElementById("totalAmount").textContent);
 
-        const username = form.username.value;
-        const email = form.email.value;
-        const phone = form.phone.value;
-        const upiId = form['upi-id'].value;
+            // Send data to the backend
+            const response = await fetch("http://localhost:3000/submit", {
+                method: "POST",
+                body: formData,
+            });
 
-        const totalAmount = document.getElementById('totalAmount').textContent;
-        const type = new URLSearchParams(window.location.search).get('type');  // Get the type from URL
-
-        // Construct the URL with the query parameters including the form data
-        const url = `payment-confirmation.html?type=${encodeURIComponent(type)}&amount=${encodeURIComponent(totalAmount)}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&upi-id=${encodeURIComponent(upiId)}`;
-
-        // Redirect to the confirmation page with the URL
-        window.location.href = url;
-    });
-</script>
+            if (response.ok) {
+                alert("Submission successful!");
+            } else {
+                alert("There was an error submitting your data.");
+            }
+        });
+    </script>
 
 </body>
 </html>
