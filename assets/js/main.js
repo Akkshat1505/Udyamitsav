@@ -185,3 +185,15 @@ eveButt.addEventListener('click', function() {
   let targetDiv = document.querySelector('#day-1');
   targetDiv.classList.remove('.hidden-events');
 });
+
+
+window.onload = () => {
+  // Select all tabs
+  const tabs = document.querySelectorAll('.navmenu');
+
+  // Remove active class from all tabs (if any)
+  // Set active class on a specific tab (e.g., second tab)
+  if (tabs[4]) {
+    tabs[3].classList.add('active'); // Change index as needed
+  }
+};
